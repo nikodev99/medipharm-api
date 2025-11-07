@@ -41,3 +41,41 @@ data class PharmacyInventory(
     @Column("created_at")
     val createdAt: LocalDateTime = LocalDateTime.now()
 )
+
+data class PharmacyInventoryDto(
+    val id: Long? = null,
+    val medication: MedicationDto? = null,
+    val quantity: Int? = null,
+    val price: Double? = 0.0,
+    val isAvailable: Boolean = true,
+    val expiryDate: LocalDateTime? = null,
+)
+
+fun PharmacyInventory.toDto(): PharmacyInventoryDto = PharmacyInventoryDto(
+    id = this.id,
+    medication = MedicationDto(
+        id = this.id,
+        name = "",
+        dci = "",
+        description = "",
+        dosage = "",
+        form = MedicationForm.OTHER,
+        manufacturer = "",
+        activeIngredients = listOf(),
+        imageUrls = listOf(),
+        requiresPrescription = false,
+    ),
+    quantity = this.quantity,
+    price = this.price,
+    isAvailable = this.isAvailable,
+    expiryDate = this.expiryDate,
+)
+
+data class AddInventoryRequest(
+    val pharmacyId: Long,
+    val medicationId: Long,
+    val quantity: Int? = null,
+    val price: Double? = 0.0,
+    val isAvailable: Boolean = true,
+    val expiryDate: LocalDateTime? = null,
+)

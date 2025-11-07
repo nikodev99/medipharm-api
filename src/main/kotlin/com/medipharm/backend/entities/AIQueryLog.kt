@@ -1,5 +1,6 @@
 package com.medipharm.backend.entities
 
+import jakarta.validation.constraints.NotBlank
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
@@ -30,4 +31,23 @@ data class AIQueryLog(
     @CreatedDate
     @Column("createdAt")
     val createdAt: LocalDateTime = LocalDateTime.now()
+)
+
+// Premium DTOs
+data class LeafletResponse(
+    val medicationId: Long,
+    val content: String,
+    val source: String
+)
+
+data class AIExplainRequest(
+    val medicationId: Long?,
+    @field:NotBlank
+    val query: String
+)
+
+data class AIExplainResponse(
+    val query: String,
+    val explanation: String,
+    val tokensUsed: Int
 )

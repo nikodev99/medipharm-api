@@ -82,3 +82,59 @@ data class Pharmacy(
     @Column("update_at")
     val updatedAt: LocalDateTime? = LocalDateTime.now()
 )
+
+data class PharmacyDto(
+    val id: Long? = null,
+    val name: String,
+    val address: String,
+    val city: String,
+    val country: String,
+    val phoneNumber: String?,
+    val alternatePhoneNumber: String? = null,
+    val latitude: Double,
+    val longitude: Double,
+    val description: String? = null,
+    val logoUrl: String? = null,
+    val averageRating: Double? = 0.0,
+    val totalReviews: Int = 0,
+    val website: String? = null,
+    val email: String? = null,
+)
+
+fun Pharmacy.toDto(): PharmacyDto = PharmacyDto(
+    id = this.id,
+    name = this.name,
+    address = this.address,
+    city = this.city,
+    country = this.country,
+    phoneNumber = this.phoneNumber,
+    alternatePhoneNumber = this.alternatePhoneNumber,
+    latitude = this.latitude,
+    longitude = this.longitude,
+    description = this.description,
+    logoUrl = this.logoUrl,
+    averageRating = this.averageRating,
+    totalReviews = this.totalReviews,
+    website = this.website,
+    email = this.email,
+)
+
+data class PharmacyAvailability(
+    val pharmacy: PharmacyDto,
+    val price: Double,
+    val quantity: Int,
+    val distance: Double?
+)
+
+data class UpdatePharmacyRequest(
+    val name: String?,
+    val address: String,
+    val city: String,
+    val country: String,
+    val phoneNumber: String?,
+    val alternatePhoneNumber: String? = null,
+    val latitude: Double,
+    val longitude: Double,
+    val description: String? = null,
+    val logoUrl: String? = null,
+)

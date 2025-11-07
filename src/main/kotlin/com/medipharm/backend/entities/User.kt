@@ -59,6 +59,56 @@ data class User(
     val updatedAt: LocalDateTime? = LocalDateTime.now()
 )
 
+data class UserDto (
+    val id: Long? = null,
+    val email: String? = null,
+    val fullName: String? = null,
+    val phoneNumber: String? = null,
+    val role: UserRole? = null,
+    val authProvider: AuthProvider? = null,
+    val providerId: String? = null,
+    val isPremium: Boolean? = null,
+    val premiumExpiryDate: LocalDateTime? = null,
+    val isActive: Boolean? = null
+)
+
+fun User.toDto(): UserDto = UserDto(
+    id = this.id,
+    email = this.email,
+    fullName = this.fullName,
+    phoneNumber = this.phoneNumber,
+    role = this.role,
+    authProvider = this.authProvider,
+    providerId = this.providerId,
+    isPremium = this.isPremium,
+    premiumExpiryDate = this.premiumExpiryDate,
+    isActive = this.isActive
+)
+
+data class SignupRequest(
+    @field:Email(message = "email must be valid")
+    @field:NotBlank(message = "email must not be blank")
+    val email: String,
+
+    @field:NotBlank(message = "password must not be blank")
+    @field:Size(min = 6, max = 100, message = "password must be between 6 and 100 characters")
+    val password: String,
+
+    @field:NotBlank(message = "username must not be blank")
+    val fullName: String,
+
+    val phoneNumber: String? = null,
+)
+
+data class LoginRequest(
+    @field:Email(message = "email must be valid")
+    @field:NotBlank(message = "email must not be blank")
+    val email: String,
+
+    @field:NotBlank(message = "password must not be blank")
+    val password: String
+)
+
 enum class UserRole {
     USER, PHARMACY_ADMIN, SUPER_ADMIN
 }

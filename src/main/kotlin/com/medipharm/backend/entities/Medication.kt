@@ -16,9 +16,15 @@ data class Medication(
     @field:NotBlank(message = "name must not be blank")
     val name: String,
 
+    @Column("name_lowercase")
+    val nameLowercase: String,
+
     @Column("dci")
     @field:NotBlank(message = "dci must not be blank")
     val dci: String,
+
+    @Column("dci_lowercase")
+    val dciLowercase: String,
 
     @Column("description")
     val description: String? = null,
@@ -55,6 +61,37 @@ data class Medication(
 
     @Column("update_at")
     val updatedAt: LocalDateTime? = LocalDateTime.now()
+)
+
+data class MedicationDto(
+    val id: Long? = null,
+    val name: String,
+    val dci: String,
+    val description: String? = null,
+    val dosage: String? = null,
+    val form: MedicationForm,
+    val manufacturer: String? = null,
+    val activeIngredients: List<String>? = null,
+    val imageUrls: List<String>? = null,
+    val requiresPrescription: Boolean = false,
+)
+
+fun Medication.toDto(): MedicationDto = MedicationDto(
+    id = this.id,
+    name = this.name,
+    dci = this.dci,
+    description = this.description,
+    dosage = this.dosage,
+    form = this.form,
+    manufacturer = this.manufacturer,
+    activeIngredients = this.activeIngredients,
+    imageUrls = this.imageUrls,
+    requiresPrescription = this.requiresPrescription,
+)
+
+data class MedicationSearchResult(
+    val medication: MedicationDto,
+    val availableAt: List<PharmacyAvailability>
 )
 
 enum class MedicationForm {
