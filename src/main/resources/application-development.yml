@@ -1,0 +1,178 @@
+spring:
+  application:
+    name: medipharm-api
+
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:medipharmdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    pool:
+      initial-size: 10
+      max-size: 50
+      max-idle-time: 30m
+      max-acquire-time: 3s
+      max-create-connection-time: 5s
+      validation-query: SELECT 1
+
+  #JDBC for flyway usage
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:medipharmdb}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  webflux:
+    base-path: /api/v1
+
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=600s,recordStats
+    cache-names:
+      - medications
+      - pharmacies
+      - search-results
+      - user-profiles
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: profile, email
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID}
+            client-secret: ${FACEBOOK_CLIENT_SECRET}
+            scope: public_profile, email
+
+  http:
+    codecs:
+      max-in-memory-size: 10MB
+
+#Resilience4j Config
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 100
+        permitted-number-of-calls-in-half-open-state: 5
+        minimum-number-of-calls: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state:
+          seconds: 60
+        failure-rate-threshold: 50
+        event-consumer-buffer-size: 10
+        record-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+        ignore-exceptions:
+          - org.springframework.web.client.HttpServerErrorException
+    instances:
+      medicationSearch:
+        base-config: default
+        wait-duration-in-open-state:
+          seconds: 30
+        failure-rate-threshold: 50
+      pharmacyService:
+        baseConfig: default
+        wait-duration-in-open-state:
+          seconds: 90
+        failure-rate-threshold: 30
+  ratelimiter:
+    configs:
+      default:
+        limit-for-period: 100
+        limit-refresh-period:
+          seconds:  1
+        timeout-duration:
+          seconds: 0
+        register-health-indicator: true
+    instances:
+      searchApi:
+        limit-for-period: 50
+        limit-refresh-period: 1s
+      authApi:
+        limit-for-period: 10
+        limit-refresh-period: 1s
+      adminApi:
+        limit-for-period: 100
+        limit-refresh-period: 1s
+  bulkhead:
+    configs:
+      default:
+        max-concurrent-calls: 100
+        max-wait-duration:
+          seconds: 1s
+    instances:
+      searchService:
+        max-concurrent-calls: 50
+      databaseService:
+        max-concurrent-calls: 100
+  timelimiter:
+    configs:
+      default:
+        timeout-duration:
+          seconds: 10
+    instances:
+      medicationSearch:
+        timeout-duration:
+          seconds: 3
+      pharmacyQuery:
+        timeout-duration:
+          seconds: 2
+
+jwt:
+  secret: ${JWT_SECRET:secret12345698770f8xyuhgslpmorhumanoide}
+  expiration: 86400000 #24 hours
+  refresh-expiration: 2592000000 #30 days
+
+server:
+  port: 8080
+  http2:
+    enabled: true
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/html,text/xml,text/plain
+  shutdown: graceful
+  netty:
+    connection-timeout: 5s
+    idle-timeout: 60s
+
+#Actuator fro health checks
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: when_authorized
+      probes:
+        enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  health:
+    circuitbreakers:
+      enabled: true
+    ratelimiters:
+      enabled: true
+
+    #Logging
+    #logging:
+    #level:
+    #root: INFO
+    #com.medipharm: DEBUG
+    #io.r2dbc: WARN
+    #org.springframework.r2dbc: WARN
+    #pattern:
+    #console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
