@@ -10,7 +10,8 @@ import reactor.core.publisher.Mono
 @Repository
 interface PharmacyRepository: R2dbcRepository<Pharmacy, Long> {
     fun findByAdminId(adminId: Long): Mono<Pharmacy>
-    fun findByIsActiveTrue(active: Boolean): Flux<Pharmacy>
+
+    fun findByIsActiveTrue(): Flux<Pharmacy>
 
     @Query("""
         SELECT * FROM pharmacies p WHERE p.is_active = true AND earth_distance(
