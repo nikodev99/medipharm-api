@@ -24,8 +24,9 @@ class CacheConfig {
         val cacheManager = CaffeineCacheManager()
         cacheManager.setCaffeine(caffeine)
         cacheManager.setCacheNames(
-            listOf<String>("medications", "pharmacies", "search-results", "user-profiles", "inventory")
+            listOf("medications", "pharmacies", "search-results", "user-profiles", "inventory")
         )
+        cacheManager.setAsyncCacheMode(true)
         return cacheManager
     }
 }

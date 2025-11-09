@@ -17,10 +17,10 @@ data class Refresh(
     val refreshToken: String,
 
     @Column("user_agent")
-    val userAgent: String,
+    val userAgent: String? = null,
 
     @Column("client_ip")
-    val  clientIp: String,
+    val  clientIp: String? = null,
 
     @Column("expiry_date")
     val  expiryDate: Instant,
@@ -38,11 +38,11 @@ data class Refresh(
     val isActive: Boolean? = true,
 
     @Column("device_fingerprint")
-    val deviceFingerprint: String,// For more sophisticated device tracking
+    val deviceFingerprint: String? = null, // For more sophisticated device tracking
 
     @Column("refresh_count")
     val refreshCount: Int? = 0,
 
     @Column("client_type")
-    val clientType: String,
+    val clientType: String? = null,
 )

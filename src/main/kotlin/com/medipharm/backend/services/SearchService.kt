@@ -42,43 +42,55 @@ class SearchService(
         val queryLower = query.lowercase().trim()
         val queryPattern = "%$queryLower%"
 
+        println("PARAMS: -----------------")
+        println("query: $query")
+        println("latitude: $latitude")
+        println("longitude: $longitude")
+        println("userId: $userId")
+        println("PARAMS: -----------------")
+
         return medicationRepository.searchMedication(queryPattern, queryLower)
             .flatMap { medication ->
-                medicationRepository.incrementSearchCount(medication.id!!).subscribe()
+                println("medication: $medication")
+                if (medication.id == null) {
+                    Mono.empty()
+                }else {
+                    medicationRepository.incrementSearchCount(medication.id).subscribe()
 
-                pharmacyInventoryRepository.findAvailableMedicationId(medication.id)
-                    .flatMap { inventory ->
-                        pharmacyRepository.findById(inventory.pharmacyId)
-                            .map { pharmacy ->
-                                val distance = if (latitude != null && longitude != null) {
-                                    calculateDistance(
-                                        latitude, longitude,
-                                        pharmacy.latitude, pharmacy.longitude
+                    pharmacyInventoryRepository.findAvailableMedicationId(medication.id)
+                        .flatMap { inventory ->
+                            pharmacyRepository.findById(inventory.pharmacyId)
+                                .map { pharmacy ->
+                                    val distance = if (latitude != null && longitude != null) {
+                                        calculateDistance(
+                                            latitude, longitude,
+                                            pharmacy.latitude, pharmacy.longitude
+                                        )
+                                    } else null
+
+                                    PharmacyAvailability(
+                                        pharmacy = pharmacy.toDto(),
+                                        price = inventory.price ?: 0.0,
+                                        quantity = inventory.quantity ?: 0,
+                                        distance = distance
                                     )
-                                } else null
-
-                                PharmacyAvailability(
-                                    pharmacy = pharmacy.toDto(),
-                                    price = inventory.price ?: 0.0,
-                                    quantity = inventory.quantity ?: 0,
-                                    distance = distance
-                                )
-                            }
-                    }
-                    .collectList()
-                    .map { availabilities ->
-                        MedicationSearchResult(
-                            medication = medication.toDto(),
-                            availableAt = availabilities.sortedBy { it.distance ?: Double.MAX_VALUE }
-                        )
-                    }
+                                }
+                        }
+                        .collectList()
+                        .map { availabilities ->
+                            MedicationSearchResult(
+                                medication = medication.toDto(),
+                                availableAt = availabilities.sortedBy { it.distance ?: Double.MAX_VALUE }
+                            )
+                        }
+                }
             }
             .doOnComplete {
                 userId?.let {
-                    searchHistoryRepository.save<SearchHistory>(SearchHistory(
+                    searchHistoryRepository.save(SearchHistory(
                         userId = it,
                         searchQuery = query,
-                        resultsCount = 0
+                        resultCount = 0
                     )).subscribe()
                 }
             }
@@ -93,29 +105,33 @@ class SearchService(
     ): Mono<MedicationSearchResult> {
         return medicationRepository.findById(medicationId)
             .flatMap { medication ->
-                pharmacyInventoryRepository.findAvailableMedicationId(medication.id as Long)
-                    .flatMap { inventory ->
-                        pharmacyRepository.findById(inventory.pharmacyId)
-                            .map { pharmacy ->
-                                val distance = if (latitude != null && longitude != null) {
-                                    calculateDistance(latitude, longitude, pharmacy.latitude, pharmacy.longitude)
-                                }else null
+                if (medication.id == null) {
+                    Mono.empty()
+                }else {
+                    pharmacyInventoryRepository.findAvailableMedicationId(medication.id)
+                        .flatMap { inventory ->
+                            pharmacyRepository.findById(inventory.pharmacyId)
+                                .map { pharmacy ->
+                                    val distance = if (latitude != null && longitude != null) {
+                                        calculateDistance(latitude, longitude, pharmacy.latitude, pharmacy.longitude)
+                                    } else null
 
-                                PharmacyAvailability(
-                                    pharmacy = pharmacy.toDto(),
-                                    price = inventory.price as Double,
-                                    quantity = inventory.quantity as Int,
-                                    distance = distance
-                                )
-                            }
-                    }
-                    .collectList()
-                    .map { availabilities ->
-                        MedicationSearchResult(
-                            medication = medication.toDto(),
-                            availableAt = availabilities.sortedBy { it.distance ?: Double.MAX_VALUE }
-                        )
-                    }
+                                    PharmacyAvailability(
+                                        pharmacy = pharmacy.toDto(),
+                                        price = inventory.price as Double,
+                                        quantity = inventory.quantity as Int,
+                                        distance = distance
+                                    )
+                                }
+                        }
+                        .collectList()
+                        .map { availabilities ->
+                            MedicationSearchResult(
+                                medication = medication.toDto(),
+                                availableAt = availabilities.sortedBy { it.distance ?: Double.MAX_VALUE }
+                            )
+                        }
+                }
             }
     }
 

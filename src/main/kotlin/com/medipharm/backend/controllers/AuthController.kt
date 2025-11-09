@@ -91,16 +91,17 @@ class AuthController(
         exchange: ServerWebExchange
     ): Mono<AuthResponse> {
         val req = RequestUtils.fromRequest(exchange.request)
+        println("REQUEST: $req")
         val expiryDate = tokenProvider.getRefreshExpiryDate().toInstant()
         return refreshService.saveRefreshToken(
             Refresh(
                 userId = user.id!!,
                 refreshToken = tokens.t2,
-                userAgent = req.userAgent!!,
-                clientIp = req.clientIp!!,
+                userAgent = req.userAgent,
+                clientIp = req.clientIp,
                 expiryDate = expiryDate,
-                deviceFingerprint = req.deviceFingerprint!!,
-                clientType = req.clientType!!,
+                deviceFingerprint = req.deviceFingerprint,
+                clientType = req.clientType,
             )
         ).map { _ -> AuthResponse(tokens.t1, tokens.t2, user.toDto()) }
     }

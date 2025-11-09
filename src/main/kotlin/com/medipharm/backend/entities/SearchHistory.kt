@@ -19,8 +19,8 @@ data class SearchHistory (
     @field:NotBlank
     val searchQuery: String,
 
-    @Column("results_count")
-    val resultsCount: Int = 0,
+    @Column("result_count")
+    val resultCount: Int = 0,
 
     @CreatedDate
     @Column("searched_at")
