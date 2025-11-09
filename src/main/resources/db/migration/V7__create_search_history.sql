@@ -2,8 +2,7 @@ CREATE TABLE search_history (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGSERIAL,
     searched_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    search_query VARCHAR(255) NOT NULL,
-    result_count INT NOT NULL DEFAULT 0
+    search_query VARCHAR(255) NOT NULL
 );
 
 -- Search history for analytics

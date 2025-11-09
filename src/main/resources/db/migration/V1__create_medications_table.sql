@@ -1,9 +1,7 @@
 CREATE TABLE IF NOT EXISTS medications(
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    name_lowercase VARCHAR(100) NOT NULL,
     dci VARCHAR(100) NOT NULL,
-    dci_lowercase VARCHAR(100) NOT NULL,
     description TEXT,
     dosage TEXT,
     form VARCHAR(32) NOT NULL, -- MedicationForm enum stocké en texte
@@ -19,9 +17,4 @@ CREATE TABLE IF NOT EXISTS medications(
 );
 
 -- Medications table with full-text search
--- Medications table with full-text search
-CREATE INDEX idx_medications_name_lower ON medications(name_lowercase);
-CREATE INDEX idx_medications_dci_lower ON medications(dci_lowercase);
 CREATE INDEX idx_medications_search_count ON medications(search_count DESC);
-CREATE INDEX idx_medications_trgm_name ON medications USING gin(name_lowercase gin_trgm_ops);
-CREATE INDEX idx_medications_trgm_dci ON medications USING gin(dci_lowercase gin_trgm_ops);
