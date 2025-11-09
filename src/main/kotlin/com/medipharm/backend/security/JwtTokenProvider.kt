@@ -31,6 +31,25 @@ class JwtTokenProvider(
         }
     }
 
+    fun generateRefreshToken(userId: Long): Mono<String> {
+        return Mono.fromCallable {
+            val now = Date()
+            val expiryDate = Date(now.time + jwtRefreshExpiration)
+
+            Jwts.builder()
+                .subject(userId.toString())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(secretKey)
+                .compact()
+        }
+    }
+
+    fun getRefreshExpiryDate(): Date {
+        val now = Date()
+        return Date(now.time + jwtRefreshExpiration)
+    }
+
     fun getUserFromToken(token: String): Mono<Long> {
         return Mono.fromCallable {
             val claims = Jwts.parser()

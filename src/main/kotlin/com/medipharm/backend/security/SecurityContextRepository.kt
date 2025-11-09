@@ -28,7 +28,8 @@ class SecurityContextRepository(
             val auth = UsernamePasswordAuthenticationToken(token, token)
 
             authenticationManager.authenticate(auth)
-                ?.map { authentication -> SecurityContextImpl(authentication) }
+                ?.map { authentication -> SecurityContextImpl(authentication) as SecurityContext }
+                ?.onErrorResume { Mono.empty() }
         }else {
             Mono.empty()
         }

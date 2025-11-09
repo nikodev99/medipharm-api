@@ -27,18 +27,19 @@ class SecurityConfig(
             .cors { it.configurationSource(corsConfigurationSource()) }
             .httpBasic { it.disable() }
             .formLogin { it.disable() }
-            .authenticationManager(jwtAuthenticationManager)
-            .securityContextRepository(securityContextRepository)
             .authorizeExchange { exchange ->
                 exchange
-                    .pathMatchers("/api/v1/auth/**", "api/v1/public/**").permitAll()
+                    .pathMatchers("/auth/**", "/public/**").permitAll()
                     .pathMatchers("/actuator/health/**", "/actuator/prometheus").permitAll()
-                    .pathMatchers("/api/v1/admin/**").hasRole("PHARMACY_ADMIN")
-                    .pathMatchers("/api/v1/premium/**").authenticated()
-                    .pathMatchers(HttpMethod.GET, "/api/v1/search/**").permitAll()
-                    .pathMatchers(HttpMethod.GET, "/api/v1/pharmacies/**").permitAll()
+                    .pathMatchers("/admin/**").hasRole("PHARMACY_ADMIN")
+                    .pathMatchers("/premium/**").authenticated()
+                    .pathMatchers(HttpMethod.GET, "/search/**").permitAll()
+                    .pathMatchers(HttpMethod.GET, "/pharmacies/**").permitAll()
                     .anyExchange().authenticated()
-            }.build()
+            }
+            .authenticationManager(jwtAuthenticationManager)
+            .securityContextRepository(securityContextRepository)
+            .build()
     }
 
     @Bean
