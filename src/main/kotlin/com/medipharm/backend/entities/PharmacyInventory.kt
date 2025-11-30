@@ -71,6 +71,21 @@ fun PharmacyInventory.toDto(): PharmacyInventoryDto = PharmacyInventoryDto(
     expiryDate = this.expiryDate,
 )
 
+fun PharmacyInventory.toDetailDto(medication: Medication) = InventoryItemDetailDto(
+    id = id!!,
+    medication = medication.toDto(),
+    quantity = quantity ?: 0,
+    price = price ?: 0.0,
+    isAvailable = isAvailable,
+    expiryDate = expiryDate?.toString(),
+    lastUpdated = lastUpdated.toString(),
+    status = when {
+        quantity == 0 -> "out-of-stock"
+        (quantity ?: 0) < 10 -> "low-stock"
+        else -> "in-stock"
+    }
+)
+
 data class AddInventoryRequest(
     val pharmacyId: Long,
     val medicationId: Long,

@@ -16,12 +16,18 @@ interface PharmacyInventoryRepository: R2dbcRepository<PharmacyInventory, Long> 
         SELECT pi.* FROM pharmacy_inventories pi WHERE pi.medication_id = :medicationId
         AND pi.is_available = true AND pi.quantity > 0 LIMIT 100
     """)
-    fun findAvailableMedicationId(medicationId: Long): Flux<PharmacyInventory>
+    fun findAvailableMedication(medicationId: Long): Flux<PharmacyInventory>
 
     fun findByPharmacyId(pharmacyId: Long): Flux<PharmacyInventory>
+
+    @Query("SELECT COUNT(pi.id) FROM pharmacy_inventories pi WHERE pi.pharmacy_id = :pharmacyId")
+    fun countByPharmacyId(pharmacyId: Long): Mono<Long>
 
     @Query("""
         SELECT COUNT(pi.id) FROM pharmacy_inventories pi WHERE pi.pharmacy_id = :pharmacyId AND pi.is_available = true
     """)
     fun countAvailableByPharmacyId(pharmacyId: Long): Mono<Long>
+
+    @Query("SELECT COUNT(pi.id) FROM pharmacy_inventories pi WHERE pi.medication_id = :medicationId AND pi.is_available = true")
+    fun countAvailableMedicationId(medicationId: Long): Mono<Long>
 }

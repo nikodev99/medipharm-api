@@ -89,6 +89,20 @@ fun Medication.toDto(): MedicationDto = MedicationDto(
     requiresPrescription = this.requiresPrescription,
 )
 
+fun Medication.toWithStatsDto(totalSearches: Long, availableIn: Int, avgPrice: Double?) = MedicationWithStatsDto(
+    id = id!!,
+    name = name,
+    dci = dci,
+    dosage = dosage ?: "N/A",
+    form = form.name,
+    manufacturer = manufacturer,
+    isActive = isActive,
+    totalSearches = totalSearches,
+    availableInPharmacies = availableIn,
+    averagePrice = avgPrice,
+    createdAt = createdAt.toString()
+)
+
 data class MedicationSearchResult(
     val medication: MedicationDto,
     val availableAt: List<PharmacyAvailability>

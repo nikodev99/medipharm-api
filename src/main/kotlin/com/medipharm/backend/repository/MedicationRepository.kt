@@ -1,6 +1,7 @@
 package com.medipharm.backend.repository
 
 import com.medipharm.backend.entities.Medication
+import com.medipharm.backend.entities.MedicationForm
 import org.springframework.data.r2dbc.repository.Modifying
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.r2dbc.repository.R2dbcRepository
@@ -36,7 +37,16 @@ interface MedicationRepository: R2dbcRepository<Medication, String> {
     @Query("SELECT m.* FROM medications m WHERE m.id = :medicationId")
     fun findById(medicationId: Long): Mono<Medication>
 
+    fun existsByNameAndDciAndDosageAndForm(
+        name: String,
+        dci: String,
+        dosage: String,
+        form: MedicationForm
+    ): Mono<Boolean>
+
     @Modifying
     @Query("UPDATE medications SET search_count = search_count + 1 WHERE id = :id")
     fun incrementSearchCount(id: Long): Mono<Void>
+
+    fun deleteById(medicationId: Long): Mono<Void>
 }

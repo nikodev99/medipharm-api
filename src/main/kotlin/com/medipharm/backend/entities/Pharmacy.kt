@@ -119,6 +119,29 @@ fun Pharmacy.toDto(): PharmacyDto = PharmacyDto(
     email = this.email,
 )
 
+fun Pharmacy.toDetailDto(admin: PharmacyAdminDto?, inventoryCount: Int) = PharmacyDetailDto(
+    id = id!!,
+    name = name,
+    address = address,
+    city = city,
+    phoneNumber = phoneNumber ?: "",
+    alternatePhoneNumber = alternatePhoneNumber,
+    email = email,
+    latitude = latitude,
+    longitude = longitude,
+    description = description,
+    logoUrl = logoUrl,
+    isActive = isActive,
+    isVerified = isVerified,
+    licenseNumber = this.licenceNumber,
+    averageRating = averageRating ?: 0.0,
+    totalReviews = totalReviews,
+    admin = admin,
+    inventoryCount = inventoryCount,
+    createdAt = createdAt.toString(),
+    updatedAt = updatedAt.toString()
+)
+
 data class PharmacyAvailability(
     val pharmacy: PharmacyDto,
     val price: Double,

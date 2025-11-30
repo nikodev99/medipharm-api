@@ -57,7 +57,7 @@ class SearchService(
                 }else {
                     medicationRepository.incrementSearchCount(medication.id).subscribe()
 
-                    pharmacyInventoryRepository.findAvailableMedicationId(medication.id)
+                    pharmacyInventoryRepository.findAvailableMedication(medication.id)
                         .flatMap { inventory ->
                             pharmacyRepository.findById(inventory.pharmacyId)
                                 .map { pharmacy ->
@@ -108,7 +108,7 @@ class SearchService(
                 if (medication.id == null) {
                     Mono.empty()
                 }else {
-                    pharmacyInventoryRepository.findAvailableMedicationId(medication.id)
+                    pharmacyInventoryRepository.findAvailableMedication(medication.id)
                         .flatMap { inventory ->
                             pharmacyRepository.findById(inventory.pharmacyId)
                                 .map { pharmacy ->

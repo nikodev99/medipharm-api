@@ -1,6 +1,5 @@
 package com.medipharm.backend.services
 
-import com.medipharm.backend.entities.Pharmacy
 import com.medipharm.backend.entities.PharmacyDto
 import com.medipharm.backend.entities.toDto
 import com.medipharm.backend.repository.PharmacyRepository

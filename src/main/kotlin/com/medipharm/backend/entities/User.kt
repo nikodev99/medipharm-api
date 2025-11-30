@@ -31,7 +31,7 @@ data class User(
     val phoneNumber: String? = null,
 
     @Column("role")
-    val role: UserRole,
+    val role: UserRole = UserRole.USER,
 
     @Column("auth_provider")
     val authProvider: AuthProvider = AuthProvider.LOCAL,
@@ -83,6 +83,32 @@ fun User.toDto(): UserDto = UserDto(
     isPremium = this.isPremium,
     premiumExpiryDate = this.premiumExpiryDate,
     isActive = this.isActive
+)
+
+fun User.toDetailDto() = UserDetailDto(
+    id = id!!,
+    email = email,
+    fullName = fullName,
+    phoneNumber = phoneNumber,
+    role = role.name,
+    isPremium = isPremium,
+    premiumExpiryDate = premiumExpiryDate?.toString(),
+    isActive = isActive,
+    emailVerified = emailVerified,
+    authProvider = authProvider.name,
+    createdAt = createdAt.toString(),
+    lastActivity = null //TODO To be tracked
+)
+
+fun User.toPharmacyAdminDto(pharmacyName: String? = null) = PharmacyAdminDto(
+    id = id!!,
+    email = email,
+    fullName = fullName,
+    phoneNumber = phoneNumber,
+    isActive = isActive,
+    pharmacyId = null, // Set if needed
+    pharmacyName = pharmacyName,
+    createdAt = createdAt.toString()
 )
 
 data class SignupRequest(
